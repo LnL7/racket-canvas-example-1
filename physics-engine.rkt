@@ -35,11 +35,18 @@
     
     ;Move avatar
     (define (move-avatar avatar)
+      (display "AVATAR")
       )
     
     ;Move obstacle
     (define (move-obstacle obstacle)
-      )
+      (let* ((pos (send-message obstacle 'position))
+             (vel (send-message obstacle 'speed))
+             (new-x (+ (coordinates-x pos) (speed-x vel)))
+             (nex-y (+ (coordinates-y pos) (speed-y vel)))
+             )
+        (send-message obstacle 'set-position! (make-coordinates new-x new-y))
+      ))
     
     
     (define (dispatch message)

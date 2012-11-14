@@ -9,11 +9,25 @@
 ; ----
 ; Instantiates a (ball) avatar with the given radius and x-coordinate
 (define (make-avatar radius x color)
-  (let (;current position
-        ;current speed
-        ) ;vertical speed in case of user input
-    
-     
+  (let ((curr-pos (make-coordinates x 0))
+        (curr-vel (make-speed 0 0))
+        (jump-vel-y 10))
+
+    (define (get-position) curr-pos)
+    (define (get-speed)    curr-vel)
+    (define (get-radius)   radius)
+    (define (get-color)    color)
+
+    (define (set-position! pos)
+      (set! curr-pos pos))
+    (define (set-speed! vel)
+      (set! curr-vel vel))
+
+    (define (up!)
+      (let ((vel (make-speed (speed-x curr-vel) jump-vel-y)))
+        (set! curr-vel vel)))
+
+
     ;Draws the object on the given game UI
     (define (draw ui)
       ;does not draw directly, but asks the UI to draw the object instead
@@ -47,15 +61,23 @@
 ;-----------------------------------------------------------------------------------------------------
 ; Instantiates a obstacle with the x- and y-coordinate
 (define (make-obstacle width height x y color)
-  (let (;current position
-        ;current speed, initialize with the obstacle's initial (constant) speed (it moves to the left!!)
-        )
-    
-       
+  (let ((curr-pos (make-coordinates x y))
+        (curr-vel (make-speed -1 0)))
+
+    (define (get-position) curr-pos)
+    (define (get-speed)    curr-vel)
+    (define (get-width)    width)
+    (define (get-height)   height)
+    (define (get-color)    color)
+
+    (define (set-position! pos)
+      (set! curr-pos pos))
+
     ;Draws the obstacle on the given game UI
     (define (draw ui)
       ;does not draw directly, but asks the UI to draw the obstacle instead
       ;this way, the game can be configured with a different UI
+      (send-message ui 'draw-obstacle dispatch)
      )
     
     (define (dispatch message)
@@ -88,15 +110,28 @@
     
     ;Draws the given avatar
     (define (draw-avatar avatar)
-       ;TODO: write the code for drawing on avatar on the screen
-      ;see Canvas.rkt
-      )
+      (let ((pos    (send-message avatar 'position))
+            (radius (send-message avatar 'radius))
+            (color  (send-message avatar 'color)))
+      (fill-ellipse!
+        (coordinates-x pos)
+        (coordinates-y pos)
+        radius
+        radius
+        color)))
     
     ;Draws the given obstacle
     (define (draw-obstacle obstacle)
-      ;TODO: write the code for drawing on obstacle on the screen
-      ;see Canvas.rkt
-      )
+      (let ((pos (send-message obstacle 'position))
+            (width (send-message obstacle 'width))
+            (height (send-message obstacle 'height))
+            (color (send-message obstacle 'color)))
+        (fill-rectangle!
+          (coordinates-x pos)
+          (coordinates-y pos)
+          width
+          height
+          color)))
     
     (define (dispatch message)
       (case message
